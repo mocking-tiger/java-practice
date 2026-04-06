@@ -20,4 +20,26 @@ public class Category {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    // id
+    public Long getId() {
+        return id;
+    }
+
+    // name
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name){
+        this.name = name;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 }

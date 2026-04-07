@@ -13,7 +13,6 @@
 - url: string
 - name: string
 - description: string
-- imageUrl: string(nullable)
 - createdAt: date
 - updatedAt: date
 - categoryId: number (삭제규칙: cascade, FK not null)

@@ -159,7 +159,11 @@ export default function Home() {
       if (description === null) return;
       const response = await axios.put(
         `http://localhost:8080/api/bookmarks/${bookmark.id}`,
-        { url, name, description },
+        {
+          url: url.startsWith("http") ? url : `https://${url}`,
+          name,
+          description,
+        },
       );
       setBookmarks(
         bookmarks.map((b) => (b.id === bookmark.id ? response.data : b)),

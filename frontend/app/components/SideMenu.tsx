@@ -21,7 +21,7 @@ const SideMenu = ({
   }
 
   return (
-    <div className="w-64 h-screen bg-gray-200">
+    <div className="w-[200px] h-screen bg-gray-200">
       <div className="pt-10 flex flex-col gap-4 items-center justify-center">
         {categories.map((category) => (
           <div

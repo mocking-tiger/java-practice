@@ -2,6 +2,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import SideMenu from "./components/SideMenu";
+import BookmarkCard from "./components/BookmarkCard";
 
 export interface Category {
   id: number;
@@ -97,19 +98,36 @@ export default function Home() {
     }
   }, [selectedCategory]);
 
-  // const handleCreateBookmarkTest = async () => {
-  //   try {
-  //     const response = await axios.post("http://localhost:8080/api/bookmarks", {
-  //       categoryId: 1,
-  //       url: "https://www.google.com",
-  //       name: "Google",
-  //       description: "Google is a search engine",
-  //     });
-  //     console.log(response.data);
-  //   } catch (error) {
-  //     console.error("북마크 생성 실패", error);
-  //   }
-  // };
+  const handleCreateBookmarkTest = async () => {
+    if (!selectedCategory) return;
+
+    try {
+      const url = prompt("1단계: 북마크 URL을 입력해주세요.");
+      if (!url) {
+        alert("북마크 URL을 입력해주세요.");
+        return;
+      }
+      const name = prompt("2단계: 북마크 이름을 입력해주세요.");
+      if (!name) {
+        alert("북마크 이름을 입력해주세요.");
+        return;
+      }
+      const description = prompt("3단계: 북마크 설명을 입력해주세요.");
+      if (!description) {
+        alert("북마크 설명을 입력해주세요.");
+        return;
+      }
+      const response = await axios.post("http://localhost:8080/api/bookmarks", {
+        categoryId: selectedCategory.id,
+        url: url.startsWith("http") ? url : `https://${url}`,
+        name,
+        description,
+      });
+      setBookmarks([...bookmarks, response.data]);
+    } catch (error) {
+      console.error("북마크 생성 실패", error);
+    }
+  };
 
   return (
     <div className="h-screen flex relative">
@@ -119,11 +137,23 @@ export default function Home() {
         onSelectCategory={setSelectedCategory}
         onAddCategory={handleCreateCategory}
       />
-      <div className="w-full h-full flex flex-col items-center justify-center gap-4">
-        <h1>react+spring boot 프로젝트</h1>
-        {bookmarks.map((bookmark) => (
-          <div key={bookmark.id}>{bookmark.name}</div>
-        ))}
+      <div className="w-full h-full">
+        <h1 className="p-4 text-2xl text-center font-bold bg-green-200">
+          {selectedCategory?.name}
+        </h1>
+        <div className="p-4">
+          <button
+            className="my-4 bg-blue-500 text-white p-2 rounded-md cursor-pointer"
+            onClick={handleCreateBookmarkTest}
+          >
+            + 북마크 추가
+          </button>
+          <div className="w-full h-full grid grid-cols-3 gap-4">
+            {bookmarks.map((bookmark) => (
+              <BookmarkCard key={bookmark.id} bookmark={bookmark} />
+            ))}
+          </div>
+        </div>
       </div>
       <button
         className="bg-green-500 text-white p-2 rounded-md absolute bottom-10 right-10"

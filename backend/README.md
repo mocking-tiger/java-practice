@@ -3,7 +3,7 @@
 ## Category
 
 - id: number
-- title: string
+- name: string
 - createdAt: date
 - updatedAt: date
 
@@ -11,7 +11,7 @@
 
 - id: number
 - url: string
-- title: string
+- name: string
 - description: string
 - imageUrl: string(nullable)
 - createdAt: date

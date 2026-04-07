@@ -98,6 +98,90 @@ export default function Home() {
     }
   }, [selectedCategory]);
 
+  // =========================================================================
+  // 카테고리 수정
+  // =========================================================================
+  const handleUpdateCategory = async () => {
+    if (!selectedCategory) return;
+    try {
+      const name = prompt(
+        "새 카테고리 이름을 입력해주세요.",
+        selectedCategory.name,
+      );
+      if (!name) return;
+      const response = await axios.put(
+        `http://localhost:8080/api/categories/${selectedCategory.id}`,
+        { name },
+      );
+      setCategories(
+        categories.map((c) =>
+          c.id === selectedCategory.id ? response.data : c,
+        ),
+      );
+      setSelectedCategory(response.data);
+    } catch (error) {
+      console.error("카테고리 수정 실패", error);
+    }
+  };
+
+  // =========================================================================
+  // 카테고리 삭제
+  // =========================================================================
+  const handleDeleteCategory = async () => {
+    if (!selectedCategory) return;
+    if (!confirm(`"${selectedCategory.name}" 카테고리를 삭제할까요?`)) return;
+    try {
+      await axios.delete(
+        `http://localhost:8080/api/categories/${selectedCategory.id}`,
+      );
+      const updated = categories.filter((c) => c.id !== selectedCategory.id);
+      setCategories(updated);
+      setSelectedCategory(updated[0] ?? null);
+      setBookmarks([]);
+    } catch (error) {
+      console.error("카테고리 삭제 실패", error);
+    }
+  };
+
+  // =========================================================================
+  // 북마크 수정
+  // =========================================================================
+  const handleUpdateBookmark = async (bookmark: Bookmark) => {
+    try {
+      const url = prompt("1단계: URL을 입력해주세요.", bookmark.url);
+      if (!url) return;
+      const name = prompt("2단계: 이름을 입력해주세요.", bookmark.name);
+      if (!name) return;
+      const description = prompt(
+        "3단계: 설명을 입력해주세요.",
+        bookmark.description,
+      );
+      if (description === null) return;
+      const response = await axios.put(
+        `http://localhost:8080/api/bookmarks/${bookmark.id}`,
+        { url, name, description },
+      );
+      setBookmarks(
+        bookmarks.map((b) => (b.id === bookmark.id ? response.data : b)),
+      );
+    } catch (error) {
+      console.error("북마크 수정 실패", error);
+    }
+  };
+
+  // =========================================================================
+  // 북마크 삭제
+  // =========================================================================
+  const handleDeleteBookmark = async (bookmarkId: number) => {
+    if (!confirm("북마크를 삭제할까요?")) return;
+    try {
+      await axios.delete(`http://localhost:8080/api/bookmarks/${bookmarkId}`);
+      setBookmarks(bookmarks.filter((b) => b.id !== bookmarkId));
+    } catch (error) {
+      console.error("북마크 삭제 실패", error);
+    }
+  };
+
   const handleCreateBookmarkTest = async () => {
     if (!selectedCategory) return;
 
@@ -138,9 +222,25 @@ export default function Home() {
         onAddCategory={handleCreateCategory}
       />
       <div className="w-full h-full">
-        <h1 className="p-4 text-2xl text-center font-bold bg-green-200">
+        <div className="relative p-4 text-2xl text-center font-bold bg-green-200">
           {selectedCategory?.name}
-        </h1>
+          {selectedCategory && (
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex gap-2">
+              <button
+                className="text-sm bg-yellow-400 text-white px-2 py-1 rounded cursor-pointer"
+                onClick={handleUpdateCategory}
+              >
+                수정
+              </button>
+              <button
+                className="text-sm bg-red-400 text-white px-2 py-1 rounded cursor-pointer"
+                onClick={handleDeleteCategory}
+              >
+                삭제
+              </button>
+            </div>
+          )}
+        </div>
         <div className="p-4">
           <button
             className="my-4 bg-blue-500 text-white p-2 rounded-md cursor-pointer"
@@ -150,7 +250,12 @@ export default function Home() {
           </button>
           <div className="w-full h-full grid grid-cols-3 gap-4">
             {bookmarks.map((bookmark) => (
-              <BookmarkCard key={bookmark.id} bookmark={bookmark} />
+              <BookmarkCard
+                key={bookmark.id}
+                bookmark={bookmark}
+                onUpdate={handleUpdateBookmark}
+                onDelete={handleDeleteBookmark}
+              />
             ))}
           </div>
         </div>
